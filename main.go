@@ -1,6 +1,7 @@
 package main
 
 import (
+	"expected_move/alphadvantage"
 	"expected_move/prices"
 	"flag"
 	"fmt"
@@ -18,11 +19,10 @@ func main() {
 	loadEnv()
 	flag.Parse()
 
-	historicalPrices := newHistoricalPrices()
-
 	var dayPrice *prices.TodaysPrices
 	var err error
 
+	historicalPrices := newHistoricalPrices()
 
 	if (*date != "") {
 		dayPrice, err = historicalPrices.GetDayPrices(*ticker, *date)
@@ -49,8 +49,11 @@ func displayTable(prices *prices.TodaysPrices) {
 
 func newHistoricalPrices() (*prices.HistoricalPrices) {
 	return &prices.HistoricalPrices{
-		Client: http.DefaultClient,
-		APIKey: os.Getenv("API_KEY"),
+		Client: &alphadvantage.Client{
+			HttpClient: http.DefaultClient,
+			Function:   "TIME_SERIES_DAILY",
+			ApiKey:     os.Getenv("API_KEY"),
+		},
 	}
 }
 

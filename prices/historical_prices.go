@@ -3,8 +3,8 @@ package prices
 import (
 	"encoding/json"
 	"errors"
+	"expected_move/alphadvantage"
 	"net/http"
-	"net/url"
 	"time"
 )
 
@@ -13,8 +13,7 @@ type HttpClientInterface interface {
 }
 
 type HistoricalPrices struct {
-	Client HttpClientInterface
-	APIKey string
+	Client alphadvantage.ClientInterface
 }
 
 func (this *HistoricalPrices) GetTodaysPricesFor(ticker string) (*TodaysPrices, error) {
@@ -22,14 +21,7 @@ func (this *HistoricalPrices) GetTodaysPricesFor(ticker string) (*TodaysPrices, 
 }
 
 func (this *HistoricalPrices) GetDayPrices(ticker string, date string) (*TodaysPrices, error) {
-	query := make(url.Values)
-	query.Set("function", "TIME_SERIES_DAILY")
-	query.Set("symbol", ticker)
-	query.Set("apikey", this.APIKey)
-	query.Set("outputsize", "compact")
-
-	request, _ := http.NewRequest("GET", "https://www.alphavantage.co/query?"+query.Encode(), nil)
-	resp, _ := this.Client.Do(request)
+	resp, _ := this.Client.GetDayPrices(ticker)
 
 	var result HistoricalPriceSearchResult
 

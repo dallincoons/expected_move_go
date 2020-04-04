@@ -2,6 +2,7 @@ package prices
 
 import (
 	"bytes"
+	"expected_move/alphadvantage"
 	"io/ioutil"
 	"net/http"
 	"testing"
@@ -10,7 +11,7 @@ import (
 func TestGetPriceForDate(t *testing.T) {
 	historicalPrices := NewHistoricalPrices()
 
-	prices, error := historicalPrices.getDayPrices("SPY", "2020-03-26")
+	prices, error := historicalPrices.GetDayPrices("SPY", "2020-03-26")
 
 	if (error != nil) {
 		t.Errorf("Error encountered when getting todays prices")
@@ -42,7 +43,7 @@ func TestGetErrorMessage(t *testing.T) {
 
 	date := "2020-04-01"
 
-	_, error := historicalPrices.getDayPrices("SPY", date)
+	_, error := historicalPrices.GetDayPrices("SPY", date)
 
 	if (error == nil) {
 		t.Errorf("Error expected when getting todays prices for date: %s", date)
@@ -51,7 +52,9 @@ func TestGetErrorMessage(t *testing.T) {
 
 func NewHistoricalPrices() (*HistoricalPrices){
 	return &HistoricalPrices{
-		Client: newFakeHttpClient(),
+		Client: &alphadvantage.Client{
+			HttpClient: newFakeHttpClient(),
+		},
 	};
 }
 
@@ -62,19 +65,6 @@ func newFakeHttpClient() *FakeHttpClient {
 type FakeHttpClient struct {
 
 }
-
-//func (this *FakeHttpClient) Do(*http.Request) (*http.Response, error) {
-//	return &http.Response{
-//		Body: ioutil.NopCloser(bytes.NewBufferString(`{
-//			"birds" : {
-//				"first" : {
-//					"species":"pigeon","description":"likes to perch on rocks"
-//				}
-//			}
-//	}`)),
-//		StatusCode: http.StatusOK,
-//	}, nil
-//}
 
 func (this *FakeHttpClient) Do(*http.Request) (*http.Response, error) {
 	return &http.Response{
