@@ -19,7 +19,7 @@ func main() {
 	loadEnv()
 	flag.Parse()
 
-	var dayPrice *prices.TodaysPrices
+	var dayPrice *prices.TimeSeriesPrice
 	var err error
 
 	historicalPrices := newHistoricalPrices()
@@ -37,7 +37,7 @@ func main() {
 	displayTable(dayPrice)
 }
 
-func displayTable(prices *prices.TodaysPrices) {
+func displayTable(prices *prices.TimeSeriesPrice) {
 	open := truncatePrice(prices.Open)
 	high := truncatePrice(prices.High)
 	low := truncatePrice(prices.Low)

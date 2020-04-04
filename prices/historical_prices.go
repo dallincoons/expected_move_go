@@ -16,11 +16,11 @@ type HistoricalPrices struct {
 	Client alphadvantage.ClientInterface
 }
 
-func (this *HistoricalPrices) GetTodaysPricesFor(ticker string) (*TodaysPrices, error) {
+func (this *HistoricalPrices) GetTodaysPricesFor(ticker string) (*TimeSeriesPrice, error) {
 	return this.GetDayPrices(ticker, time.Now().Format("2006-01-02"))
 }
 
-func (this *HistoricalPrices) GetDayPrices(ticker string, date string) (*TodaysPrices, error) {
+func (this *HistoricalPrices) GetDayPrices(ticker string, date string) (*TimeSeriesPrice, error) {
 	resp, _ := this.Client.GetDayPrices(ticker)
 
 	var result HistoricalPriceSearchResult
@@ -33,7 +33,7 @@ func (this *HistoricalPrices) GetDayPrices(ticker string, date string) (*TodaysP
 		return nil, errors.New("No prices were retrieved")
 	}
 
-	return &TodaysPrices{
+	return &TimeSeriesPrice{
 		Date: 	date,
 		Open:   day.Open,
 		High:   day.High,
@@ -55,7 +55,7 @@ type HistoricalPriceSearchResult struct {
 	TimeSeries map[string]MostRecentDay `json:"Time Series (Daily)"`
 }
 
-type TodaysPrices struct {
+type TimeSeriesPrice struct {
 	Date string
 	Open string
 	High string
