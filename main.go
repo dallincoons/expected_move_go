@@ -4,22 +4,31 @@ import (
 	"expected_move/prices"
 	"flag"
 	"fmt"
+	"github.com/joho/godotenv"
 	"log"
 	"net/http"
 	"os"
 	"strconv"
-	"github.com/joho/godotenv"
 )
 
 var ticker = flag.String("ticker", "SPY", "Ticker to retrieve price from")
-//var date = flag.String("date", time.Now().Format("2006-01-02"), "Date to pull historical prices for")
+var date = flag.String("date", "", "Date to pull historical prices for")
 
 func main() {
 	loadEnv()
+	flag.Parse()
 
 	historicalPrices := newHistoricalPrices()
 
-	dayPrice, err := historicalPrices.GetTodaysPricesFor(*ticker)
+	var dayPrice *prices.TodaysPrices
+	var err error
+
+
+	if (*date != "") {
+		dayPrice, err = historicalPrices.GetDayPrices(*ticker, *date)
+	} else {
+		dayPrice, err = historicalPrices.GetTodaysPricesFor(*ticker)
+	}
 
 	if (err != nil) {
 		log.Fatal("Could not retrieve price")

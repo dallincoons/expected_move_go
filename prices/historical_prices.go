@@ -18,10 +18,10 @@ type HistoricalPrices struct {
 }
 
 func (this *HistoricalPrices) GetTodaysPricesFor(ticker string) (*TodaysPrices, error) {
-	return this.getDayPrices(ticker, time.Now().Format("2006-01-02"))
+	return this.GetDayPrices(ticker, time.Now().Format("2006-01-02"))
 }
 
-func (this *HistoricalPrices) getDayPrices(ticker string, date string) (*TodaysPrices, error) {
+func (this *HistoricalPrices) GetDayPrices(ticker string, date string) (*TodaysPrices, error) {
 	query := make(url.Values)
 	query.Set("function", "TIME_SERIES_DAILY")
 	query.Set("symbol", ticker)
