@@ -24,16 +24,19 @@ type Client struct {
 }
 
 func (this *Client) GetDayPrices(ticker string) (*http.Response, error) {
-	fmt.Println(this.OutputSize)
+	urlString := fmt.Sprintf("%s/query?%s", BASE_URL, this.buildQueryString(ticker))
+
+	request, _ := http.NewRequest("GET", urlString, nil)
+
+	return this.HttpClient.Do(request)
+}
+
+func (this *Client) buildQueryString(ticker string) (string) {
 	query := make(url.Values)
 	query.Set("function", "TIME_SERIES_DAILY")
 	query.Set("symbol", ticker)
 	query.Set("apikey", this.ApiKey)
 	query.Set("outputsize", "compact")
 
-	urlString := fmt.Sprintf("%s/query?%s", BASE_URL, query.Encode())
-
-	request, _ := http.NewRequest("GET", urlString, nil)
-
-	return this.HttpClient.Do(request)
+	return query.Encode()
 }
