@@ -2,11 +2,9 @@ package prices
 
 import (
 	"expected_move/alphadvantage"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
-	"strconv"
 )
 
 type HistoricalPriceController struct {
@@ -42,10 +40,4 @@ func newHistoricalPrices() *HistoricalPrices {
 			ApiKey:     os.Getenv("API_KEY"),
 		},
 	}
-}
-
-func truncatePrice(price string) string {
-	numPrice, _ := strconv.ParseFloat(price, 64)
-
-	return fmt.Sprintf("%.2f", numPrice)
 }

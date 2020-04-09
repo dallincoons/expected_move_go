@@ -3,6 +3,7 @@ package prices
 import (
 	"fmt"
 	"os"
+	"encoding/csv"
 )
 
 type DisplayStrategyInterface interface {
@@ -18,11 +19,23 @@ func (this *DisplayTable) Write(prices *TimeSeriesPrice) {
 }
 
 func (this *DisplayTable) displayTable(prices *TimeSeriesPrice) {
-	open := truncatePrice(prices.Open)
-	high := truncatePrice(prices.High)
-	low := truncatePrice(prices.Low)
-	close := truncatePrice(prices.Close)
-
 	fmt.Fprintf(os.Stdout,"%-10s | %-8s | %-8s | %-8s | %-8s | %-8s\n", "Date", "Open", "High", "Low", "Close", "Volume")
-	fmt.Fprintf(os.Stdout, "%-10s | %-8s | %-8s | %-8s | %-8s | %-8s\n", prices.Date, open, high, low, close, prices.Volume)
+	fmt.Fprintf(os.Stdout, "%-10s | %-8s | %-8s | %-8s | %-8s | %-8s\n", prices.Date, prices.Open, prices.High, prices.Low, prices.Close, prices.Volume)
 }
+
+type WriteCSV struct {
+
+}
+
+func (this *WriteCSV) Write(prices *TimeSeriesPrice) {
+	this.writeCSV(prices)
+}
+
+func (this *WriteCSV) writeCSV(prices *TimeSeriesPrice) {
+	w := csv.NewWriter(os.Stdout)
+
+	w.Write([]string{prices.Date, prices.Open, prices.High, prices.Low, prices.Close, prices.Volume})
+
+	w.Flush()
+}
+

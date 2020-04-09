@@ -17,7 +17,7 @@ func main() {
 	pricesController := &prices.HistoricalPriceController{
 		Ticker: *ticker,
 		Date:   *date,
-		WriteStrategy: &prices.DisplayTable{},
+		WriteStrategy: &prices.WriteCSV{},
 	}
 
 	pricesController.GetPrices()

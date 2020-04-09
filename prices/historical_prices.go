@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"errors"
 	"expected_move/alphadvantage"
+	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -35,10 +37,10 @@ func (this *HistoricalPrices) GetDayPrices(ticker string, date string) (*TimeSer
 
 	return &TimeSeriesPrice{
 		Date: 	date,
-		Open:   day.Open,
-		High:   day.High,
-		Low:    day.Low,
-		Close:  day.Close,
+		Open:   truncatePrice(day.Open),
+		High:   truncatePrice(day.High),
+		Low:    truncatePrice(day.Low),
+		Close:  truncatePrice(day.Close),
 		Volume: day.Volume,
 	}, nil
 }
@@ -62,4 +64,10 @@ type TimeSeriesPrice struct {
 	Low string
 	Close string
 	Volume string
+}
+
+func truncatePrice(price string) string {
+	numPrice, _ := strconv.ParseFloat(price, 64)
+
+	return fmt.Sprintf("%.2f", numPrice)
 }
