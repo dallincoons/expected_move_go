@@ -17,19 +17,19 @@ func TestGetPriceForDate(t *testing.T) {
 		t.Errorf("Error encountered when getting todays prices")
 	}
 
-	if (prices.Open != "249.5200") {
+	if (prices.Open != "249.52") {
 		t.Errorf("Incorrect value for open price, %s found", prices.Open)
 	}
 
-	if (prices.High != "262.8000") {
+	if (prices.High != "262.80") {
 		t.Errorf("Incorrect value for high price, %s found", prices.High)
 	}
 
-	if (prices.Low != "249.0500") {
+	if (prices.Low != "249.05") {
 		t.Errorf("Incorrect value for low price, %s found", prices.Low)
 	}
 
-	if (prices.Close != "261.2000") {
+	if (prices.Close != "261.20") {
 		t.Errorf("Incorrect value for close price, %s found", prices.Close)
 	}
 

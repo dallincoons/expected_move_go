@@ -1,9 +1,9 @@
 package prices
 
 import (
+	"encoding/csv"
 	"fmt"
 	"os"
-	"encoding/csv"
 )
 
 type DisplayStrategyInterface interface {
