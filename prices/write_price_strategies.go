@@ -3,6 +3,8 @@ package prices
 import (
 	"encoding/csv"
 	"fmt"
+	"io"
+	"log"
 	"os"
 )
 
@@ -24,7 +26,8 @@ func (this *DisplayTable) displayTable(prices *TimeSeriesPrice) {
 }
 
 type WriteCSV struct {
-
+	Writer io.Writer
+	DisplayToUser io.Writer
 }
 
 func (this *WriteCSV) Write(prices *TimeSeriesPrice) {
@@ -32,10 +35,16 @@ func (this *WriteCSV) Write(prices *TimeSeriesPrice) {
 }
 
 func (this *WriteCSV) writeCSV(prices *TimeSeriesPrice) {
-	w := csv.NewWriter(os.Stdout)
+	w := csv.NewWriter(this.Writer)
 
-	w.Write([]string{prices.Date, prices.Open, prices.High, prices.Low, prices.Close, prices.Volume})
+	err := w.Write([]string{prices.Date, prices.Open, prices.High, prices.Low, prices.Close, prices.Volume})
+
+	if (err != nil ) {
+		log.Fatalf("Could not write to file, %s", err)
+	}
 
 	w.Flush()
+
+	fmt.Fprintln(this.DisplayToUser, "price writte")
 }
 
