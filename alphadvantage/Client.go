@@ -26,7 +26,11 @@ type Client struct {
 func (this *Client) GetDayPrices(ticker string) (*http.Response, error) {
 	urlString := fmt.Sprintf("%s/query?%s", BASE_URL, this.buildQueryString(ticker))
 
-	request, _ := http.NewRequest("GET", urlString, nil)
+	request, err := http.NewRequest("GET", urlString, nil)
+
+	if (err != nil) {
+		return nil, err
+	}
 
 	return this.HttpClient.Do(request)
 }

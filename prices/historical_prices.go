@@ -23,7 +23,11 @@ func (this *HistoricalPrices) GetTodaysPricesFor(ticker string) (*TimeSeriesPric
 }
 
 func (this *HistoricalPrices) GetDayPrices(ticker string, date string) (*TimeSeriesPrice, error) {
-	resp, _ := this.Client.GetDayPrices(ticker)
+	resp, err := this.Client.GetDayPrices(ticker)
+
+	if (err != nil) {
+		return nil, err
+	}
 
 	var result HistoricalPriceSearchResult
 
@@ -32,7 +36,7 @@ func (this *HistoricalPrices) GetDayPrices(ticker string, date string) (*TimeSer
 	day, ok := result.TimeSeries[date]
 
 	if !ok {
-		return nil, errors.New("No prices were retrieved")
+		return nil, errors.New(fmt.Sprintf("No prices were found for date %s", date))
 	}
 
 	return &TimeSeriesPrice{

@@ -26,7 +26,7 @@ func (this *HistoricalPriceController) GetPrices() {
 	}
 
 	if err != nil {
-		log.Fatal("Could not retrieve price")
+		log.Fatal(err)
 	}
 
 	this.WriteStrategy.Write(dayPrice)
