@@ -1,11 +1,16 @@
 package prices
 
 import (
+	"database/sql"
+	_ "database/sql"
 	"encoding/csv"
 	"fmt"
 	"io"
 	"log"
 	"os"
+
+	_ "github.com/lib/pq"
+	"github.com/jmoiron/sqlx"
 )
 
 type DisplayStrategyInterface interface {
@@ -48,3 +53,37 @@ func (this *WriteCSV) writeCSV(prices *TimeSeriesPrice) {
 	fmt.Fprintln(this.DisplayToUser, "price writte")
 }
 
+type WritePostgres struct {
+
+}
+
+type Person struct {
+	FirstName string `db:"first_name"`
+	LastName  string `db:"last_name"`
+	Email     string
+}
+
+type Place struct {
+	Country string
+	City    sql.NullString
+	TelCode int
+}
+
+func (this *WritePostgres) Write(prices *TimeSeriesPrice) {
+	this.writePostgres(prices)
+}
+
+
+func (this *WritePostgres) writePostgres(prices *TimeSeriesPrice) {
+	db, err := sqlx.Connect("postgres", "user=postgres password=secret dbname=postgres sslmode=disable")
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	tx := db.MustBegin()
+
+	tx.MustExec("INSERT INTO daily_prices (date, open, high, low, close, volume) VALUEs ($1, $2, $3, $4, $5, $6)",
+		prices.Date, prices.Open, prices.High, prices.Low, prices.Close, prices.Volume)
+
+	tx.Commit()
+}
