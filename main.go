@@ -1,49 +1,22 @@
+/*
+Copyright © 2020 NAME HERE <EMAIL ADDRESS>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package main
 
-import (
-	"expected_move/prices"
-	"flag"
-	"github.com/joho/godotenv"
-	"log"
-	"os"
-)
-
-var ticker = flag.String("ticker", "SPY", "Ticker to retrieve price from")
-var date = flag.String("date", "", "Date to pull historical prices for")
-var file = flag.String("file", "", "file to write prices")
+import "expected_move/cmd"
 
 func main() {
-	loadEnv()
-	flag.Parse()
-
-	openFile := getCsvWriter()
-
-	pricesController := &prices.HistoricalPriceController{
-		Ticker: *ticker,
-		Date:   *date,
-		WriteStrategy: &prices.WriteCSV{
-			Writer: openFile,
-			DisplayToUser: os.Stdout,
-		},
-	}
-
-	pricesController.GetPrices()
-}
-
-func getCsvWriter() *os.File {
-
-	file, err := os.OpenFile(*file, os.O_WRONLY|os.O_APPEND, 0644)
-
-	if err != nil {
-		log.Fatalf("failed opening fle, %s", err)
-	}
-
-	return file
-}
-
-func loadEnv() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	cmd.Execute()
 }

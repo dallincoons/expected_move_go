@@ -9,8 +9,8 @@ import (
 	"log"
 	"os"
 
-	_ "github.com/lib/pq"
 	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 )
 
 type DisplayStrategyInterface interface {
@@ -50,7 +50,7 @@ func (this *WriteCSV) writeCSV(prices *TimeSeriesPrice) {
 
 	w.Flush()
 
-	fmt.Fprintln(this.DisplayToUser, "price writte")
+	fmt.Fprintln(this.DisplayToUser, "price written")
 }
 
 type WritePostgres struct {

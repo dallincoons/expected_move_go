@@ -2,9 +2,9 @@ package prices
 
 import (
 	"expected_move/alphadvantage"
+	"github.com/spf13/viper"
 	"log"
 	"net/http"
-	"os"
 )
 
 type HistoricalPriceController struct {
@@ -37,7 +37,7 @@ func newHistoricalPrices() *HistoricalPrices {
 		Client: &alphadvantage.Client{
 			HttpClient: http.DefaultClient,
 			Function:   "TIME_SERIES_DAILY",
-			ApiKey:     os.Getenv("API_KEY"),
+			ApiKey:     viper.GetString("API_KEY"),
 		},
 	}
 }

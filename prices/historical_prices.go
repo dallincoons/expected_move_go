@@ -1,9 +1,9 @@
 package prices
 
 import (
+	"expected_move/alphadvantage"
 	"encoding/json"
 	"errors"
-	"expected_move/alphadvantage"
 	"fmt"
 	"net/http"
 	"strconv"
