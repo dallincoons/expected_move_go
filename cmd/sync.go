@@ -31,29 +31,41 @@ var syncCmd = &cobra.Command{
 	cobra.Command, args []string) {
 		ticker, _ := cmd.Flags().GetString("ticker")
 		date, _ := cmd.Flags().GetString("date")
-		fileName, _ := cmd.Flags().GetString("file")
-
-		openFile := getCsvWriter(&fileName)
 
 		pricesController := &prices.HistoricalPriceController{
 			Ticker: ticker,
 			Date:   date,
-			WriteStrategy: &prices.WriteCSV{
-				Writer: openFile,
-				DisplayToUser: os.Stdout,
-			},
+			WriteStrategy: getWriteStrategy(cmd),
 		}
 
 		pricesController.GetPrices()
 	},
 }
 
-func getCsvWriter(fileName *string) *os.File {
+func getWriteStrategy(cmd *cobra.Command) prices.DisplayStrategyInterface {
 
+	fileName, _ := cmd.Flags().GetString("file")
+
+	if (fileName != "") {
+		return &prices.WriteCSV{
+			Writer:        getCsvWriter(&fileName),
+			DisplayToUser: os.Stdout,
+		}
+	}
+
+	return &prices.DisplayTable{}
+}
+
+func getCsvWriter(fileName *string) *os.File {
 	file, err := os.OpenFile(*fileName, os.O_WRONLY|os.O_APPEND, 0644)
 
 	if err != nil {
-		log.Fatalf("failed opening file, %s", err)
+		log.Println("creating file")
+		file, err = os.Create(*fileName)
+
+		if err != nil {
+			log.Fatalf("cannot read or create file %s", fileName)
+		}
 	}
 
 	return file

@@ -5,6 +5,7 @@ import (
 	_ "database/sql"
 	"encoding/csv"
 	"fmt"
+	"github.com/spf13/viper"
 	"io"
 	"log"
 	"os"
@@ -75,7 +76,7 @@ func (this *WritePostgres) Write(prices *TimeSeriesPrice) {
 
 
 func (this *WritePostgres) writePostgres(prices *TimeSeriesPrice) {
-	db, err := sqlx.Connect("postgres", "user=postgres password=secret dbname=postgres sslmode=disable")
+	db, err := sqlx.Connect("postgres", viper.GetString("POSTGRES_DSN"))
 	if err != nil {
 		log.Fatalln(err)
 	}
