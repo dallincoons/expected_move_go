@@ -2,20 +2,16 @@ package prices
 
 import (
 	"bytes"
+	"io"
 	"testing"
 )
 
 func TestWriteToCSV(t *testing.T) {
-	writer := &FakeWriter{
-		Output: &bytes.Buffer{},
-	}
-	fakeStdOut := &FakeWriter{
-		Output: &bytes.Buffer{},
-	}
+	writer := new(bytes.Buffer)
 
 	csvWriter := &WriteCSV{
 		Writer: writer,
-		DisplayToUser: fakeStdOut,
+		DisplayToUser: new(bytes.Buffer),
 	}
 
 	csvWriter.writeCSV(&TimeSeriesPrice{
@@ -27,8 +23,32 @@ func TestWriteToCSV(t *testing.T) {
 		Volume: "1010101",
 	})
 
-	if (writer.Output.String() != "2020-01-01,101.13,101.14,101.15,101.16,1010101\n") {
-		t.Errorf("Error writing csv contents, recieved %s, expected %s", writer.Output.String(), "020-01-01,101.13,101.14,101.15,101.16,1010101")
+	if (writer.String() != "2020-01-01,101.13,101.14,101.15,101.16,1010101\n") {
+		t.Errorf("Error writing csv contents, recieved %s, expected %s", writer.String(), "020-01-01,101.13,101.14,101.15,101.16,1010101")
+	}
+}
+
+func TestWriteToCsvDoesNotOverwriteTheLastRecordIfDatesMatch(t *testing.T) {
+	writer := new(bytes.Buffer)
+
+	writer.WriteString("2020-01-01,101.13,101.14,101.15,101.16,1010101\n2020-01-02,101.13,101.14,101.15,101.16,1010101")
+
+	csvWriter := &WriteCSV{
+		Writer: writer,
+		DisplayToUser: new(bytes.Buffer),
+	}
+
+	err := csvWriter.writeCSV(&TimeSeriesPrice{
+		Date:   "2020-01-01",
+		Open:   "101.13",
+		High:   "101.14",
+		Low:    "101.15",
+		Close:  "101.16",
+		Volume: "1010101",
+	})
+
+	if (err == nil) {
+		t.Fatalf("Expected error due to price already having been written.")
 	}
 }
 
@@ -100,11 +120,29 @@ func TestWriteToPostgres(t *testing.T) {
 }
 
 type FakeWriter struct {
+	TimesRead int
 	Output *bytes.Buffer
+	Contents []byte
 }
 
 func (this *FakeWriter) Write(p []byte) (n int, err error) {
 	this.Output.Write(p)
 
 	return 0, nil
+}
+
+func (this *FakeWriter) Read(p []byte) (n int, err error) {
+	if this.TimesRead > 0 {
+		return 0, io.EOF
+	}
+
+	p = append(p, this.Contents...)
+
+	this.TimesRead++
+
+	return len(this.Contents), nil
+}
+
+func (this *FakeWriter) Close() error {
+	return nil
 }

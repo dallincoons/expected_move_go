@@ -29,7 +29,11 @@ func (this *HistoricalPriceController) GetPrices() {
 		log.Fatal(err)
 	}
 
-	this.WriteStrategy.Write(dayPrice)
+	err = this.WriteStrategy.Write(dayPrice)
+
+	if err != nil {
+		log.Fatalf(err.Error())
+	}
 }
 
 func newHistoricalPrices() *HistoricalPrices {
