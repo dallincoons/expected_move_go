@@ -1,12 +1,17 @@
 package prices
 
 import (
+	"bytes"
 	"testing"
 )
 
 func TestWriteToCSV(t *testing.T) {
-	writer := &FakeWriter{}
-	fakeStdOut := &FakeWriter{}
+	writer := &FakeWriter{
+		Output: &bytes.Buffer{},
+	}
+	fakeStdOut := &FakeWriter{
+		Output: &bytes.Buffer{},
+	}
 
 	csvWriter := &WriteCSV{
 		Writer: writer,
@@ -22,8 +27,8 @@ func TestWriteToCSV(t *testing.T) {
 		Volume: "1010101",
 	})
 
-	if (string(writer.Output) != "2020-01-01,101.13,101.14,101.15,101.16,1010101\n") {
-		t.Errorf("Error writing csv contents, recieved %s, expected %s", writer.Output, "020-01-01,101.13,101.14,101.15,101.16,1010101")
+	if (writer.Output.String() != "2020-01-01,101.13,101.14,101.15,101.16,1010101\n") {
+		t.Errorf("Error writing csv contents, recieved %s, expected %s", writer.Output.String(), "020-01-01,101.13,101.14,101.15,101.16,1010101")
 	}
 }
 
@@ -95,11 +100,11 @@ func TestWriteToPostgres(t *testing.T) {
 }
 
 type FakeWriter struct {
-	Output []byte
+	Output *bytes.Buffer
 }
 
 func (this *FakeWriter) Write(p []byte) (n int, err error) {
-	this.Output = p
+	this.Output.Write(p)
 
 	return 0, nil
 }
