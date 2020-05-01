@@ -57,7 +57,7 @@ func getWriteStrategy(cmd *cobra.Command) prices.DisplayStrategyInterface {
 }
 
 func getCsvWriter(fileName *string) *os.File {
-	file, err := os.OpenFile(*fileName, os.O_APPEND, 0644)
+	file, err := os.OpenFile(*fileName, os.O_APPEND|os.O_RDWR, 0644)
 
 	if err != nil {
 		log.Println("creating file")

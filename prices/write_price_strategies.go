@@ -44,11 +44,11 @@ func (this *WriteCSV) Write(prices *TimeSeriesPrice) (error) {
 }
 
 func (this *WriteCSV) writeCSV(prices *TimeSeriesPrice) (error) {
-	w := csv.NewWriter(this.Writer)
-
 	if this.recordAlreadyRecord(prices.Date) == true {
-		return errors.New(fmt.Sprintf("Hisotrical price for %s has already been written", prices.Date))
+		return errors.New(fmt.Sprintf("Historical price for %s has already been written", prices.Date))
 	}
+
+	w := csv.NewWriter(this.Writer)
 
 	writeErr := w.Write([]string{prices.Date, prices.Open, prices.High, prices.Low, prices.Close, prices.Volume})
 
@@ -57,6 +57,12 @@ func (this *WriteCSV) writeCSV(prices *TimeSeriesPrice) (error) {
 	}
 
 	w.Flush()
+
+	werr := w.Error()
+
+	if (werr != nil) {
+		log.Fatal(werr)
+	}
 
 	fmt.Fprintln(this.DisplayToUser, "price written")
 
