@@ -64,7 +64,7 @@ func getCsvWriter(fileName *string) *os.File {
 		file, err = os.Create(*fileName)
 
 		if err != nil {
-			log.Fatalf("cannot read or create file %s", fileName)
+			log.Fatalf("cannot read or create file %s", *fileName)
 		}
 	}
 

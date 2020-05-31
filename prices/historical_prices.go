@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -47,6 +48,27 @@ func (this *HistoricalPrices) GetDayPrices(ticker string, date string) (*TimeSer
 		Close:  truncatePrice(day.Close),
 		Volume: day.Volume,
 	}, nil
+}
+
+func (this *HistoricalPrices) GetAllDayPrices(tickers []string, date string) []*TimeSeriesPrice {
+	results := make(chan *TimeSeriesPrice, len(tickers))
+	var timeSeries []*TimeSeriesPrice
+
+	for _, ticker := range tickers {
+		go func(t string) {
+			result, err := this.GetDayPrices(t, date)
+			if err != nil {
+				log.Println(fmt.Sprintf("Could not retrieve price for ticker %s", t))
+			}
+			results <- result
+		}(ticker)
+	}
+
+	for range tickers {
+		timeSeries = append(timeSeries, <- results)
+	}
+
+	return timeSeries
 }
 
 type MostRecentDay struct {

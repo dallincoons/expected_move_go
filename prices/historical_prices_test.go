@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"expected_move/alphadvantage"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"testing"
 )
@@ -35,6 +36,16 @@ func TestGetPriceForDate(t *testing.T) {
 
 	if (prices.Volume != "245530812") {
 		t.Errorf("Incorrect value for volume, %s found", prices.Volume)
+	}
+}
+
+func TestGetMultipleHistoricalPrices(t *testing.T) {
+	historicalPrices := NewHistoricalPrices()
+
+	prices := historicalPrices.GetAllDayPrices([]string{"SPY", "SPX"}, "2020-03-26")
+
+	if (len(prices) != 2) {
+		log.Fatalf("did not recieve expected count of 2 results, for spy and spx ticker")
 	}
 }
 
