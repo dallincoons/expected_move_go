@@ -1,9 +1,9 @@
 package prices
 
 import (
-	"expected_move/alphadvantage"
 	"encoding/json"
 	"errors"
+	"expected_move/alphadvantage"
 	"fmt"
 	"log"
 	"net/http"
@@ -41,6 +41,7 @@ func (this *HistoricalPrices) GetDayPrices(ticker string, date string) (*TimeSer
 	}
 
 	return &TimeSeriesPrice{
+		Ticker: ticker,
 		Date: 	date,
 		Open:   truncatePrice(day.Open),
 		High:   truncatePrice(day.High),
@@ -84,6 +85,7 @@ type HistoricalPriceSearchResult struct {
 }
 
 type TimeSeriesPrice struct {
+	Ticker string
 	Date string
 	Open string
 	High string

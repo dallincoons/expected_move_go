@@ -18,8 +18,7 @@ package cmd
 import (
 	"expected_move/prices"
 	"github.com/spf13/cobra"
-	"log"
-	"os"
+	"net/http"
 )
 
 // syncCmd represents the sync command
@@ -27,48 +26,17 @@ var syncCmd = &cobra.Command{
 	Use:   "sync",
 	Short: "Retrieve price for stock ticker",
 	Long: ``,
-	Run: func(cmd *
-	cobra.Command, args []string) {
+	Run: func(cmd *cobra.Command, args []string) {
 		ticker, _ := cmd.Flags().GetString("ticker")
 		date, _ := cmd.Flags().GetString("date")
+		fileName, _ := cmd.Flags().GetString("file")
 
 		pricesController := &prices.HistoricalPriceController{
-			Ticker: ticker,
-			Date:   date,
-			WriteStrategy: getWriteStrategy(cmd),
+			Client: &http.Client{},
 		}
 
-		pricesController.GetPrices()
+		pricesController.GetPrice(ticker, date, prices.GetWriteStrategy(fileName))
 	},
-}
-
-func getWriteStrategy(cmd *cobra.Command) prices.DisplayStrategyInterface {
-
-	fileName, _ := cmd.Flags().GetString("file")
-
-	if (fileName != "") {
-		return &prices.WriteCSV{
-			Writer:        getCsvWriter(&fileName),
-			DisplayToUser: os.Stdout,
-		}
-	}
-
-	return &prices.DisplayTable{}
-}
-
-func getCsvWriter(fileName *string) *os.File {
-	file, err := os.OpenFile(*fileName, os.O_APPEND|os.O_RDWR, 0644)
-
-	if err != nil {
-		log.Println("creating file")
-		file, err = os.Create(*fileName)
-
-		if err != nil {
-			log.Fatalf("cannot read or create file %s", *fileName)
-		}
-	}
-
-	return file
 }
 
 func init() {
