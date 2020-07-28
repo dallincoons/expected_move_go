@@ -11,22 +11,13 @@ type HistoricalPriceController struct {
 	Client alphadvantage.HttpClientInterface
 }
 
-func (this *HistoricalPriceController) GetPrices(date string, writers map[string]DisplayStrategyInterface) {
+func (this *HistoricalPriceController) GetPrices(date string, tickers []string, writer DisplayStrategyInterface) {
 	historicalPrices := newHistoricalPrices(this.Client)
-
-	tickers := make([]string, len(writers))
-	i := 0
-	for ticker := range writers {
-		tickers[i] = ticker
-		i++
-	}
 
 	timeSeries := historicalPrices.GetAllDayPrices(tickers, date)
 
-	for _, t := range timeSeries {
-		writer, _ := writers[t.Ticker]
-
-		writer.Write(t)
+	for _, ts := range timeSeries {
+		writer.Write(ts)
 	}
 }
 

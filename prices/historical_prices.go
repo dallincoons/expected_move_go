@@ -61,12 +61,12 @@ func (this *HistoricalPrices) GetAllDayPrices(tickers []string, date string) []*
 			if err != nil {
 				log.Println(fmt.Sprintf("Could not retrieve price for ticker %s", t))
 			}
-			results <- result
+			results<-result
 		}(ticker)
 	}
 
 	for range tickers {
-		timeSeries = append(timeSeries, <- results)
+		timeSeries = append(timeSeries, <-results)
 	}
 
 	return timeSeries

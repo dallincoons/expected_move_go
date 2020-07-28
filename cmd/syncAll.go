@@ -1,18 +1,3 @@
-/*
-Copyright © 2020 NAME HERE <EMAIL ADDRESS>
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
 package cmd
 
 import (
@@ -20,10 +5,11 @@ import (
 	"fmt"
 	"github.com/spf13/cobra"
 	"net/http"
+	"os"
 	"time"
+	"github.com/joho/godotenv"
 )
 
-// syncAllCmd represents the syncAll command
 var syncAllCmd = &cobra.Command{
 	Use:   "syncAll",
 	Short: "A brief description of your command",
@@ -35,19 +21,17 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		date, _ := cmd.Flags().GetString("date")
-		filepath, _ := cmd.Flags().GetString("filepath")
+		//filepath, _ := cmd.Flags().GetString("filepath")
 
 		pricesController := &prices.HistoricalPriceController{
 			Client: http.DefaultClient,
 		}
 
-		writers := createWriters(filepath);
-
-		pricesController.GetPrices(date, writers)
+		pricesController.GetPrices(date, prices.GetTickers(), getWriteStrategy())
 	},
 }
 
-func createWriters(filepath string) map[string]prices.DisplayStrategyInterface {
+func createWriter(filepath string) map[string]prices.DisplayStrategyInterface {
 	writers := make(map[string]prices.DisplayStrategyInterface)
 	for _, ticker := range prices.GetTickers() {
 		writers[ticker] = prices.GetWriteStrategy(fmt.Sprintf("%s/%s.csv", filepath, ticker))
@@ -56,7 +40,19 @@ func createWriters(filepath string) map[string]prices.DisplayStrategyInterface {
 	return writers
 }
 
+func getWriteStrategy() prices.DisplayStrategyInterface {
+	return &prices.WritePostgres{
+		Dsn: fmt.Sprintf("postgresql://%s:%s@localhost:5432/%s?sslmode=disable",
+			os.Getenv("POSTGRES_USER"),
+			os.Getenv("POSTGRES_PASSWORD"),
+			os.Getenv("POSTGRES_DATABASE"),
+		),
+	}
+}
+
 func init() {
+	godotenv.Load()
+
 	rootCmd.AddCommand(syncAllCmd)
 
 	syncAllCmd.Flags().String("date", time.Now().Format("2006-01-02"), "Date to pull historical prices for")

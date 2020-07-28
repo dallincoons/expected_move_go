@@ -6,7 +6,6 @@ import (
 	"encoding/csv"
 	"errors"
 	"fmt"
-	"github.com/spf13/viper"
 	"io"
 	"log"
 	"os"
@@ -95,7 +94,7 @@ func (this *WriteCSV) recordAlreadyRecord(date string) bool {
 }
 
 type WritePostgres struct {
-
+	Dsn string
 }
 
 type Person struct {
@@ -116,15 +115,15 @@ func (this *WritePostgres) Write(prices *TimeSeriesPrice) (error) {
 
 
 func (this *WritePostgres) writePostgres(prices *TimeSeriesPrice) (error) {
-	db, err := sqlx.Connect("postgres", viper.GetString("POSTGRES_DSN"))
+	db, err := sqlx.Connect("postgres", this.Dsn)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
 	tx := db.MustBegin()
 
-	tx.MustExec("INSERT INTO daily_prices (date, open, high, low, close, volume) VALUEs ($1, $2, $3, $4, $5, $6)",
-		prices.Date, prices.Open, prices.High, prices.Low, prices.Close, prices.Volume)
+	tx.MustExec("INSERT INTO daily_prices (symbol, date, open_price, high_price, low_price, close_price, volume) VALUEs ($1, $2, $3, $4, $5, $6, $7)",
+		prices.Ticker, prices.Date, prices.Open, prices.High, prices.Low, prices.Close, prices.Volume)
 
 	tx.Commit()
 
