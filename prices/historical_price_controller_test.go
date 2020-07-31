@@ -5,19 +5,16 @@ import (
 	"testing"
 )
 
-var output = map[string]*TimeSeriesPrice{}
+var output = make(map[string]*TimeSeriesPrice)
 
 func TestGetMultiplePricesForDate(t *testing.T) {
 	historical_price_controller := &HistoricalPriceController{
 		Client: &FakeHttpClient{},
 	}
 
-	writers := map[string]DisplayStrategyInterface{
-		"SPY": &FakeDisplay{},
-		"QQQ": &FakeDisplay{},
-	}
+	writer := FakeWriter{Contents: output}
 
-	 historical_price_controller.GetPrices("2020-03-26", writers)
+	historical_price_controller.GetPrices("2020-03-26", []string{"SPY", "QQQ"}, &writer)
 
 	_, spy_found := output["SPY"]
 
@@ -36,7 +33,7 @@ type FakeDisplay struct {
 }
 
 func (this *FakeDisplay) Write(prices *TimeSeriesPrice) (error) {
-	output[prices.Ticker] = prices
+	//output[prices.Ticker] = prices
 
 	return nil
 }

@@ -4,11 +4,14 @@ import (
 	"expected_move/alphadvantage"
 	"github.com/spf13/viper"
 	"log"
-	"net/http"
 )
 
 type HistoricalPriceController struct {
 	Client alphadvantage.HttpClientInterface
+}
+
+func (this *HistoricalPriceController) GetAllDayPricesForAllDates(from string, to string, tickers []string, writer DisplayStrategyInterface) {
+
 }
 
 func (this *HistoricalPriceController) GetPrices(date string, tickers []string, writer DisplayStrategyInterface) {
@@ -47,7 +50,7 @@ func (this *HistoricalPriceController) GetPrice(ticker, date string, writer Disp
 func newHistoricalPrices(client alphadvantage.HttpClientInterface) *HistoricalPrices {
 	return &HistoricalPrices{
 		Client: &alphadvantage.Client{
-			HttpClient: http.DefaultClient,
+			HttpClient: client,
 			Function:   "TIME_SERIES_DAILY",
 			ApiKey:     viper.GetString("API_KEY"),
 		},

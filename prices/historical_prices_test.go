@@ -44,7 +44,7 @@ func TestGetPriceForDate(t *testing.T) {
 func TestGetMultipleHistoricalPrices(t *testing.T) {
 	historicalPrices := NewHistoricalPrices()
 
-	prices := historicalPrices.GetAllDayPrices([]string{"SPY", "SPX"}, "2020-03-26")
+	prices := historicalPrices.GetAllDayPrices([]string{"SPY", "QQQ"}, "2020-03-26")
 
 	if (len(prices) != 2) {
 		log.Fatalf("did not recieve expected count of 2 results, for spy and spx ticker")
