@@ -3,11 +3,11 @@ package cmd
 import (
 	"expected_move/prices"
 	"fmt"
+	"github.com/joho/godotenv"
 	"github.com/spf13/cobra"
 	"net/http"
 	"os"
 	"time"
-	"github.com/joho/godotenv"
 )
 
 var syncAllCmd = &cobra.Command{
@@ -20,13 +20,24 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		date, _ := cmd.Flags().GetString("date")
+		from, _ := cmd.Flags().GetString("from")
+		to, _ := cmd.Flags().GetString("to")
 
 		pricesController := &prices.HistoricalPriceController{
 			Client: http.DefaultClient,
 		}
 
-		pricesController.GetPrices(date, prices.GetTickers(), getWriteStrategy())
+		tz, _ := time.LoadLocation("Local")
+
+		fromDate, err := time.ParseInLocation("2006-01-02", from, tz)
+		toDate, err := time.ParseInLocation("2006-01-02", to, tz)
+
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		pricesController.GetAllDayPricesForRange(fromDate, toDate, getWriteStrategy())
 	},
 }
 
@@ -55,6 +66,6 @@ func init() {
 	rootCmd.AddCommand(syncAllCmd)
 
 	syncAllCmd.Flags().String("date", time.Now().Format("2006-01-02"), "Date to pull historical prices for")
-	syncAllCmd.Flags().String("from", time.Now().AddDate(0,0,-1).Format("2006-01-02"), "")
+	syncAllCmd.Flags().String("from", time.Now().AddDate(0,0,0).Format("2006-01-02"), "")
 	syncAllCmd.Flags().String("to", time.Now().Format("2006-01-02"), "")
 }

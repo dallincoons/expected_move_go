@@ -59,7 +59,7 @@ func (this *HistoricalPrices) GetAllDayPrices(tickers []string, date string) []*
 		go func(t string) {
 			result, err := this.GetDayPrices(t, date)
 			if err != nil {
-				log.Println(fmt.Sprintf("Could not retrieve price for ticker %s", t))
+				log.Println(fmt.Sprintf("Could not retrieve price for ticker %s on date %s", t, date))
 			}
 			results<-result
 		}(ticker)

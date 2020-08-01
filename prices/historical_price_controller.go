@@ -2,16 +2,22 @@ package prices
 
 import (
 	"expected_move/alphadvantage"
+	"expected_move/utility"
 	"github.com/spf13/viper"
 	"log"
+	"time"
 )
 
 type HistoricalPriceController struct {
 	Client alphadvantage.HttpClientInterface
 }
 
-func (this *HistoricalPriceController) GetAllDayPricesForAllDates(from string, to string, tickers []string, writer DisplayStrategyInterface) {
+func (pricesController *HistoricalPriceController) GetAllDayPricesForRange(from time.Time, to time.Time, writer DisplayStrategyInterface) {
+	tk := utility.NewTimeKeeper()
 
+	for _, day := range tk.GetWeekdaysSince(from) {
+		pricesController.GetPrices(day.Format("2006-01-02"), GetTickers(), writer)
+	}
 }
 
 func (this *HistoricalPriceController) GetPrices(date string, tickers []string, writer DisplayStrategyInterface) {

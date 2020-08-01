@@ -115,6 +115,10 @@ func (this *WritePostgres) Write(prices *TimeSeriesPrice) (error) {
 
 
 func (this *WritePostgres) writePostgres(prices *TimeSeriesPrice) (error) {
+	if prices == nil {
+		log.Fatal("Price not found")
+	}
+
 	db, err := sqlx.Connect("postgres", this.Dsn)
 	if err != nil {
 		log.Fatalln(err)
@@ -125,7 +129,7 @@ func (this *WritePostgres) writePostgres(prices *TimeSeriesPrice) (error) {
 	query := `
 		INSERT INTO daily_prices
 		(symbol, date, open_price, high_price, low_price, close_price, volume)	
-		 VALUEs 
+		 VALUES
 		 ($1, $2, $3, $4, $5, $6, $7)
 		 ON CONFLICT ON CONSTRAINT symbol_date
 		 DO
@@ -134,9 +138,17 @@ func (this *WritePostgres) writePostgres(prices *TimeSeriesPrice) (error) {
 		 				volume = EXCLUDED.volume
 	`
 
-	tx.MustExec(query, prices.Ticker, prices.Date, prices.Open, prices.High, prices.Low, prices.Close, prices.Volume)
+	result := tx.MustExec(query, prices.Ticker, prices.Date, prices.Open, prices.High, prices.Low, prices.Close, prices.Volume)
 
-	tx.Commit()
+	rowsAffected, err := result.RowsAffected()
+
+	fmt.Sprintln("Rows affected: %d", rowsAffected)
+
+	err = tx.Commit()
+
+	if err != nil {
+		log.Print(err)
+	}
 
 	return nil
 }
