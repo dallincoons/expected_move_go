@@ -6,7 +6,6 @@ import (
 	"expected_move/alphadvantage"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"testing"
 )
@@ -38,16 +37,6 @@ func TestGetPriceForDate(t *testing.T) {
 
 	if (prices.Volume != "245530812") {
 		t.Errorf("Incorrect value for volume, %s found", prices.Volume)
-	}
-}
-
-func TestGetMultipleHistoricalPrices(t *testing.T) {
-	historicalPrices := NewHistoricalPrices()
-
-	prices := historicalPrices.GetAllDayPrices([]string{"SPY", "QQQ"}, "2020-03-26")
-
-	if (len(prices) != 2) {
-		log.Fatalf("did not recieve expected count of 2 results, for spy and spx ticker")
 	}
 }
 
@@ -113,6 +102,13 @@ func (this *FakeHttpClient) Do(r *http.Request) (*http.Response, error) {
 			"3. low": "233.8000",
 			"4. close": "243.1500",
 			"5. volume": "233038623"
+		},
+		"2020-03-23": {
+			"1. open": "333.4200",
+			"2. high": "323.1000",
+			"3. low": "332.8000",
+			"4. close": "343.1500",
+			"5. volume": "233012345"
 		}
 	}
 	}`)),
@@ -149,6 +145,13 @@ func (this *FakeHttpClient) Do(r *http.Request) (*http.Response, error) {
 			"3. low": "233.8000",
 			"4. close": "243.1500",
 			"5. volume": "233038623"
+		},
+		"2020-03-23": {
+			"1. open": "235.4200",
+			"2. high": "245.1000",
+			"3. low": "234.8000",
+			"4. close": "244.1500",
+			"5. volume": "233038624"
 		}
 	}
 	}`)),

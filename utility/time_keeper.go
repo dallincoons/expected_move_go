@@ -22,10 +22,10 @@ func (tk *timeKeeper) IsBeforeToday(from time.Time) bool {
 	return time.Now().Sub(from).Hours() >= 24
 }
 
-func (tk *timeKeeper) GetWeekdaysSince(from time.Time) []time.Time {
+func (tk *timeKeeper) GetWeekdaysSince(from time.Time, to time.Time) []time.Time {
 	current := from
 	var daysSince []time.Time
-	for current.Before(tk.Now) || current.Equal(tk.Now) {
+	for current.Before(to) || current.Equal(to) {
 		if isTradingDay(current) {
 			daysSince = append(daysSince, current)
 		}

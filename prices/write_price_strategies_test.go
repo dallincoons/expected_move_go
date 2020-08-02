@@ -121,12 +121,12 @@ func TestWriteToPostgres(t *testing.T) {
 
 type FakeWriter struct {
 	TimesRead int
-	Output *bytes.Buffer
-	Contents map[string]*TimeSeriesPrice
+	Output    *bytes.Buffer
+	Contents   []*TimeSeriesPrice
 }
 
 func (this *FakeWriter) Write(prices *TimeSeriesPrice) (error) {
-	this.Contents[prices.Ticker] = prices
+	this.Contents = append(this.Contents, prices)
 
 	return nil
 }
@@ -135,8 +135,6 @@ func (this *FakeWriter) Read(p []byte) (n int, err error) {
 	if this.TimesRead > 0 {
 		return 0, io.EOF
 	}
-
-	//p = append(p, this.Contents...)
 
 	this.TimesRead++
 

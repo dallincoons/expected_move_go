@@ -10,13 +10,14 @@ import (
 
 type HistoricalPriceController struct {
 	Client alphadvantage.HttpClientInterface
+	Tickers []string
 }
 
 func (pricesController *HistoricalPriceController) GetAllDayPricesForRange(from time.Time, to time.Time, writer DisplayStrategyInterface) {
 	tk := utility.NewTimeKeeper()
 
-	for _, day := range tk.GetWeekdaysSince(from) {
-		pricesController.GetPrices(day.Format("2006-01-02"), GetTickers(), writer)
+	for _, day := range tk.GetWeekdaysSince(from, to) {
+		pricesController.GetPrices(day.Format("2006-01-02"), pricesController.Tickers, writer)
 	}
 }
 

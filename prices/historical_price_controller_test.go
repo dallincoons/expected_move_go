@@ -3,18 +3,24 @@ package prices
 import (
 	"log"
 	"testing"
+	"time"
 )
-
-var output = make(map[string]*TimeSeriesPrice)
 
 func TestGetMultiplePricesForDate(t *testing.T) {
 	historical_price_controller := &HistoricalPriceController{
 		Client: &FakeHttpClient{},
 	}
 
-	writer := FakeWriter{Contents: output}
+	writer := FakeWriter{}
+
 
 	historical_price_controller.GetPrices("2020-03-26", []string{"SPY", "QQQ"}, &writer)
+
+	output := make(map[string]*TimeSeriesPrice)
+
+	for _, price := range writer.Contents {
+		output[price.Ticker] = price
+	}
 
 	_, spy_found := output["SPY"]
 
@@ -26,6 +32,43 @@ func TestGetMultiplePricesForDate(t *testing.T) {
 
 	if (!qqq_found) {
 		log.Fatal("QQQ stock not found when retrieving multiple prices")
+	}
+}
+
+func TestPricesForAllTickersForDateRange(t *testing.T) {
+	historical_price_controller := &HistoricalPriceController{
+		Client: &FakeHttpClient{},
+		Tickers: []string{"SPY", "QQQ"},
+	}
+
+	writer := FakeWriter{}
+
+	from, _ := time.ParseInLocation("2006-01-02", "2020-03-25", time.Local)
+	to, _ := time.ParseInLocation("2006-01-02", "2020-03-26", time.Local)
+
+	historical_price_controller.GetAllDayPricesForRange(from, to, &writer)
+
+	output := writer.Contents
+	dates := make(map[string]*TimeSeriesPrice)
+
+	for _, price := range writer.Contents {
+		dates[price.Date] = price
+	}
+
+	if len(output) != 4 {
+		t.Errorf("Expected 4 prices, got: %d", len(output))
+	}
+
+	if len(dates) != 2 {
+		t.Errorf("Expected 4 dates, got %d", len(dates))
+	}
+
+	if _, found := dates["2020-03-25"]; !found {
+		t.Errorf("date 2020-03-25 not found")
+	}
+
+	if _, found := dates["2020-03-26"]; !found {
+		t.Errorf("date 2020-03-26 not found")
 	}
 }
 

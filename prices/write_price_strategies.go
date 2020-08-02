@@ -138,11 +138,8 @@ func (this *WritePostgres) writePostgres(prices *TimeSeriesPrice) (error) {
 		 				volume = EXCLUDED.volume
 	`
 
-	result := tx.MustExec(query, prices.Ticker, prices.Date, prices.Open, prices.High, prices.Low, prices.Close, prices.Volume)
-
-	rowsAffected, err := result.RowsAffected()
-
-	fmt.Sprintln("Rows affected: %d", rowsAffected)
+	//todo: handle errors
+	tx.MustExec(query, prices.Ticker, prices.Date, prices.Open, prices.High, prices.Low, prices.Close, prices.Volume)
 
 	err = tx.Commit()
 
