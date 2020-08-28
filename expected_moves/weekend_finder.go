@@ -12,6 +12,12 @@ type WeekendFinder struct {
 	Calendar CalendarInterface
 }
 
+type Calendar struct {}
+
+func (c Calendar) Today() time.Time {
+	return time.Now()
+}
+
 func (wf WeekendFinder) GetNextFriday() time.Time {
 	weekday := wf.Calendar.Today().Weekday()
 

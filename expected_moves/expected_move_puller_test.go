@@ -13,7 +13,7 @@ func TestPullExpectedMoveForUpcomingWeek (t *testing.T) {
 		HttpClient: &FakeHttpClient{},
 	}
 
-	em := puller.getExpectedMove("spy", "2020-08-28", "2020-08-29")
+	em := puller.GetExpectedMove("spy", "2020-08-28")
 
 	if em.HighPrice == "" {
 		t.Errorf("Missing high price")
@@ -30,8 +30,8 @@ func TestPullExpectedMoveForUpcomingWeek (t *testing.T) {
 
 type FakeHttpClient struct {}
 
-func (*FakeHttpClient) getATMOptions(symbol string, from string, to string) http.Response {
-	return http.Response{
+func (*FakeHttpClient) getATMOptions(symbol string, from string) (*http.Response, error) {
+	return &http.Response{
 		Body: ioutil.NopCloser(bytes.NewBufferString(`
 			{
 				"symbol":"SPY",
@@ -148,7 +148,7 @@ func (*FakeHttpClient) getATMOptions(symbol string, from string, to string) http
 						"inTheMoney":true,
 						"mini":false}]}}}
 		`)),
-	}
+	}, nil
 }
 
 func TestGetDateForNextFriday (t *testing.T) {

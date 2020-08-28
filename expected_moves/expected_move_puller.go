@@ -4,10 +4,41 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 )
 
+const BASE_URL = "https://api.tdameritrade.com/v1/marketdata/chains"
+
 type HttpEMClient interface {
-	getATMOptions(symbol string, from string, to string) http.Response
+	getATMOptions(symbol string, from string) (*http.Response, error)
+}
+
+type HttpClient struct {
+	http.Client
+	ApiKey string
+}
+
+func (c HttpClient) getATMOptions(symbol string, from string) (*http.Response, error) {
+	urlString := fmt.Sprintf("%s?%s", BASE_URL, c.buildQueryString(symbol, from))
+
+	request, err := http.NewRequest("GET", urlString, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return c.Do(request)
+}
+
+func (c HttpClient) buildQueryString(symbol string, from string) string {
+	query := make(url.Values)
+	query.Set("apikey", c.ApiKey)
+	query.Set("symbol", symbol)
+	query.Set("strikeCount", "1")
+	query.Set("fromDate", from)
+	query.Set("toDate", from)
+
+	return query.Encode()
 }
 
 type ExpectedMovePuller struct {
@@ -36,8 +67,8 @@ type CallMap struct {
 	Price float32 `json:"underlyingPrice"`
 }
 
-func (p ExpectedMovePuller) getExpectedMove(symbol string, from string, to string) ExpectedMove {
-	response := p.HttpClient.getATMOptions(symbol, from, to)
+func (p ExpectedMovePuller) GetExpectedMove(symbol string, from string) ExpectedMove {
+	response, _ := p.HttpClient.getATMOptions(symbol, from)
 	defer response.Body.Close()
 
 	var callMap CallMap
