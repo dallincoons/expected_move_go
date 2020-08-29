@@ -110,11 +110,6 @@ type Place struct {
 }
 
 func (this *WritePostgres) Write(prices *TimeSeriesPrice) (error) {
-	return this.writePostgres(prices)
-}
-
-
-func (this *WritePostgres) writePostgres(prices *TimeSeriesPrice) (error) {
 	if prices == nil {
 		log.Fatal("Price not found")
 	}

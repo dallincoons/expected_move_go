@@ -26,7 +26,7 @@ import (
 
 // syncExpectedMoveCmd represents the syncExpectedMove command
 var syncExpectedMoveCmd = &cobra.Command{
-	Use:   "syncExpectedMove",
+	Use:   "syncExpectedMoves",
 	Short: "A brief description of your command",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
@@ -48,9 +48,17 @@ to quickly create a Cobra application.`,
 
 		nextFriday := finder.GetNextFriday()
 
-		em := puller.GetExpectedMove("SPY", nextFriday.Format("2006-01-02"))
+		moves := puller.GetExpectedMoves(nextFriday.Format("2006-01-02"))
 
-		fmt.Println(em)
+		writer := expected_moves.PostgresWriter{
+			Dsn: fmt.Sprintf("postgresql://%s:%s@localhost:5432/%s?sslmode=disable",
+				os.Getenv("POSTGRES_USER"),
+				os.Getenv("POSTGRES_PASSWORD"),
+				os.Getenv("POSTGRES_DATABASE"),
+			),
+		}
+
+		writer.Write(moves)
 	},
 }
 

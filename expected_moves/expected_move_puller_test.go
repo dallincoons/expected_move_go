@@ -26,6 +26,40 @@ func TestPullExpectedMoveForUpcomingWeek (t *testing.T) {
 	if em.LowPrice != "334.69" {
 		t.Errorf("Wanted an expected move of 334.69, got %v", em.LowPrice)
 	}
+
+	if em.PeriodStartDate != "2020-08-24" {
+		t.Errorf("Expected week start date of 2020-08-24, got %s", em.PeriodStartDate)
+	}
+
+	if em.PeriodEndDate != "2020-08-28" {
+		t.Errorf("Expected week end date of 2020-08-28, go %s", em.PeriodEndDate)
+	}
+}
+
+func TestPullAllExpectedMovesForUpcomingWeek(t *testing.T) {
+	mockClient :=  &MockHttpClient{}
+
+	puller := &ExpectedMovePuller{
+		HttpClient: mockClient,
+	}
+
+	puller.GetExpectedMoves("2020-08-27")
+
+	if len(mockClient.SymbolsReached) != 2 {
+		t.Errorf("expected 2 symbols reached, got %d", len(mockClient.SymbolsReached))
+	}
+}
+
+type MockHttpClient struct {
+	SymbolsReached []string
+}
+
+func (c *MockHttpClient) getATMOptions(symbol string, from string) (*http.Response, error) {
+	c.SymbolsReached = append(c.SymbolsReached, symbol)
+
+	return &http.Response{
+		Body: ioutil.NopCloser(bytes.NewBufferString(``)),
+	}, nil
 }
 
 type FakeHttpClient struct {}

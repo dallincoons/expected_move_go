@@ -2,9 +2,12 @@ package expected_moves
 
 import (
 	"encoding/json"
+	"expected_move/prices"
 	"fmt"
 	"net/http"
 	"net/url"
+	"time"
+	"github.com/icza/gox/timex"
 )
 
 const BASE_URL = "https://api.tdameritrade.com/v1/marketdata/chains"
@@ -46,6 +49,7 @@ type ExpectedMovePuller struct {
 }
 
 type ExpectedMove struct {
+	PeriodStartDate string
 	PeriodEndDate string
 	Symbol string
 	StartPrice string
@@ -67,6 +71,24 @@ type CallMap struct {
 	Price float32 `json:"underlyingPrice"`
 }
 
+func (p ExpectedMovePuller) GetExpectedMoves(date string) []ExpectedMove {
+	tickers := prices.GetTickers()
+	moves := make(chan ExpectedMove, len(tickers))
+
+	for _, ticker := range tickers {
+		go func(t string) {
+			moves <- p.GetExpectedMove(t, date)
+		}(ticker)
+	}
+
+	mv := make([]ExpectedMove, len(tickers))
+	for i := range tickers {
+		mv[i] = <-moves
+	}
+
+	return mv
+}
+
 func (p ExpectedMovePuller) GetExpectedMove(symbol string, from string) ExpectedMove {
 	response, _ := p.HttpClient.getATMOptions(symbol, from)
 	defer response.Body.Close()
@@ -75,9 +97,17 @@ func (p ExpectedMovePuller) GetExpectedMove(symbol string, from string) Expected
 
 	json.NewDecoder(response.Body).Decode(&callMap)
 
+	fmt.Println(callMap)
+
 	move := p.getCallBid(callMap) + p.getPutBid(callMap)
 
+	f, _ := time.Parse("2006-01-02", from)
+	year, week := f.ISOWeek()
+
 	return ExpectedMove{
+		Symbol: symbol,
+		PeriodStartDate: timex.WeekStart(year, week).Format("2006-01-02"),
+		PeriodEndDate: from,
 		StartPrice: fmt.Sprintf("%.2f", callMap.Price),
 		HighPrice:  fmt.Sprintf("%.2f", callMap.Price+move),
 		LowPrice:   fmt.Sprintf("%.2f", callMap.Price-move),
