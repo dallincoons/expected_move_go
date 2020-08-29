@@ -4,7 +4,7 @@ services:
   postgres_db:
     image: postgres:latest
     networks:
-      new:
+      host:
         aliases:
           - database
     container_name: expected_move_psql
@@ -14,14 +14,5 @@ services:
       - ./volumes/postgres:/var/lib/postgresql/data
     env_file:
       - ./.env
-  migrate:
-    image: migrate/migrate
-    networks:
-      - new
-    volumes:
-      - ./migrations:/migrations
-    command: ["-v", "/Users/dallincoons/go/src/expected_move/migrations:/migrations", "--network", "host", "migrate/migrate", "-path", "/migrations/", "-database", "postgresql://root:secret@localhost:5432/expected_move?sslmode=disable", "up"]
-    links:
-      - postgres_db
 networks:
-  new:
+  host:
