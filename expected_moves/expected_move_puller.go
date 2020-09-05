@@ -46,6 +46,7 @@ func (c HttpClient) buildQueryString(symbol string, from string) string {
 
 type ExpectedMovePuller struct {
 	HttpClient HttpEMClient
+	WeekendFinder WeekendFinder
 }
 
 type ExpectedMove struct {
@@ -71,13 +72,13 @@ type CallMap struct {
 	Price float32 `json:"underlyingPrice"`
 }
 
-func (p ExpectedMovePuller) GetExpectedMoves(date string) []ExpectedMove {
+func (p ExpectedMovePuller) GetExpectedMoves() []ExpectedMove {
 	tickers := prices.GetTickers()
 	moves := make(chan ExpectedMove, len(tickers))
 
 	for _, ticker := range tickers {
 		go func(t string) {
-			moves <- p.GetExpectedMove(t, date)
+			moves <- p.GetExpectedMove(t, p.WeekendFinder.GetNextFriday().Format("2006-01-02"))
 		}(ticker)
 	}
 
@@ -96,8 +97,6 @@ func (p ExpectedMovePuller) GetExpectedMove(symbol string, from string) Expected
 	var callMap CallMap
 
 	json.NewDecoder(response.Body).Decode(&callMap)
-
-	fmt.Println(callMap)
 
 	move := p.getCallBid(callMap) + p.getPutBid(callMap)
 

@@ -1,6 +1,12 @@
 version: '2.0'
 
 services:
+  app:
+    build: .
+#    image: golang:1.13-alpine3.12
+#    networks:
+#      - host
+#    container_name: expected_move_backend
   postgres_db:
     image: postgres:latest
     networks:

@@ -29,37 +29,38 @@ var syncExpectedMoveCmd = &cobra.Command{
 	Use:   "syncExpectedMoves",
 	Short: "A brief description of your command",
 	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+		   and usage of using your command. For example:
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+			Cobra is a CLI library for Go that empowers applications.
+			This application is a tool to generate the needed files
+			to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		puller := expected_moves.ExpectedMovePuller{
-			HttpClient: expected_moves.HttpClient{
-				Client: http.Client{},
-				ApiKey: os.Getenv("TDA_API_KEY"),
-			},
-		}
-
-		finder := expected_moves.WeekendFinder{
-			Calendar: expected_moves.Calendar{},
-		}
-
-		nextFriday := finder.GetNextFriday()
-
-		moves := puller.GetExpectedMoves(nextFriday.Format("2006-01-02"))
-
-		writer := expected_moves.PostgresWriter{
-			Dsn: fmt.Sprintf("postgresql://%s:%s@localhost:5432/%s?sslmode=disable",
-				os.Getenv("POSTGRES_USER"),
-				os.Getenv("POSTGRES_PASSWORD"),
-				os.Getenv("POSTGRES_DATABASE"),
-			),
-		}
-
-		writer.Write(moves)
+		SyncExpectedMoves()
 	},
+}
+
+func SyncExpectedMoves() {
+	puller := expected_moves.ExpectedMovePuller{
+		HttpClient: expected_moves.HttpClient{
+			Client: http.Client{},
+			ApiKey: os.Getenv("TDA_API_KEY"),
+		},
+		WeekendFinder: expected_moves.WeekendFinder{
+			Calendar: expected_moves.Calendar{},
+		},
+	}
+
+	moves := puller.GetExpectedMoves()
+
+	writer := expected_moves.PostgresWriter{
+		Dsn: fmt.Sprintf("postgresql://%s:%s@localhost:5432/%s?sslmode=disable",
+			os.Getenv("POSTGRES_USER"),
+			os.Getenv("POSTGRES_PASSWORD"),
+			os.Getenv("POSTGRES_DATABASE"),
+		),
+	}
+
+	writer.Write(moves)
 }
 
 func init() {
