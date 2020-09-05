@@ -8,4 +8,4 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o main .
 #FROM scratch
 #COPY --from=builder /build/scheduler /app/scheduler
 #WORKDIR /app/scheduler
-CMD ["./schedule"]
+CMD ["./main", "scheduleExpectedMoves"]
