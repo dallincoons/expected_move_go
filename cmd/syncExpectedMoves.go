@@ -53,7 +53,7 @@ func SyncExpectedMoves() {
 	moves := puller.GetExpectedMoves()
 
 	writer := expected_moves.PostgresWriter{
-		Dsn: fmt.Sprintf("postgresql://%s:%s@localhost:5432/%s?sslmode=disable",
+		Dsn: fmt.Sprintf("postgresql://%s:%s@postgres_db:5432/%s?sslmode=disable",
 			os.Getenv("POSTGRES_USER"),
 			os.Getenv("POSTGRES_PASSWORD"),
 			os.Getenv("POSTGRES_DATABASE"),

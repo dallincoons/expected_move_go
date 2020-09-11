@@ -14,9 +14,12 @@ type PostgresWriter struct {
 }
 
 func (w PostgresWriter) Write(moves []ExpectedMove) error {
-
 	db, err := sqlx.Connect("postgres", w.Dsn)
-	defer db.Close()
+	defer func() {
+		if db != nil {
+			db.Close()
+		}
+	}()
 
 	if err != nil {
 		log.Fatalln(err)
