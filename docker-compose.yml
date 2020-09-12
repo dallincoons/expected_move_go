@@ -1,9 +1,16 @@
 version: '2.0'
 
 services:
-  app:
+  expected_move_scheduler:
     build: .
-    container_name: expected_move_backend
+    container_name: expected_move_scheduler
+    command: ["./main", "scheduleExpectedMoves"]
+  prices_scheduler:
+    build: .
+    container_name: prices_scheduler
+    command: ["./main", "schedulePrices"]
+    env_file:
+      - ./.env
   postgres_db:
     image: postgres:latest
     container_name: expected_move_psql

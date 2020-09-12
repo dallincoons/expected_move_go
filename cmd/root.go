@@ -18,7 +18,10 @@ package cmd
 import (
 	"fmt"
 	"github.com/spf13/cobra"
+	"log"
 	"os"
+	"os/signal"
+	"sync"
 
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
@@ -88,4 +91,21 @@ func initConfig() {
 	if err := viper.ReadInConfig(); err != nil {
 		fmt.Println("cannot use config file: ", viper.ConfigFileUsed())
 	}
+}
+
+func KeepAlive() {
+	wg := sync.WaitGroup{}
+
+	wg.Add(1)
+
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs)
+
+	go func() {
+		s := <-sigs
+		log.Printf("\nReceived Signal: %s", s)
+		os.Exit(1)
+	}()
+
+	wg.Wait()
 }
