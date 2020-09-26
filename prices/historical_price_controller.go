@@ -3,8 +3,8 @@ package prices
 import (
 	"expected_move/alphadvantage"
 	"expected_move/utility"
+	"fmt"
 	"github.com/spf13/viper"
-	"log"
 	"time"
 )
 
@@ -44,13 +44,14 @@ func (this *HistoricalPriceController) GetPrice(ticker, date string, writer Disp
 	}
 
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err.Error())
+		return
 	}
 
 	err = writer.Write(dayPrice)
 
 	if err != nil {
-		log.Fatalf(err.Error())
+		fmt.Println(err.Error())
 	}
 }
 

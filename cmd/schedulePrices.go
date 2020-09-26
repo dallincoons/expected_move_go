@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"github.com/robfig/cron/v3"
 	"github.com/spf13/cobra"
 	"time"
@@ -19,11 +20,15 @@ var schedulePricesCmd = &cobra.Command{
 func schedulePricePulling() {
 	c := cron.New()
 
-	//c.AddFunc("0 16 * * 1-5", func () {
-	//	pullPrices()
-	//})
+	c.AddFunc("0 16 * * 1-5", func () {
+		defer func() {
+			if err := recover(); err != nil {
+				fmt.Println(err)
+			}
+		}()
 
-	c.AddFunc("* * * * *", func () {
+		fmt.Println("pulling...")
+
 		pullPrices()
 	})
 

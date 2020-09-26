@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"sync"
 	"time"
 )
 
@@ -55,17 +56,27 @@ func (this *HistoricalPrices) GetAllDayPrices(tickers []string, date string) []*
 	results := make(chan *TimeSeriesPrice, len(tickers))
 	var timeSeries []*TimeSeriesPrice
 
+	var wg sync.WaitGroup
+
+	wg.Add(len(tickers))
+
 	for _, ticker := range tickers {
-		go func(t string) {
+		go func(t string, wg *sync.WaitGroup) {
 			result, err := this.GetDayPrices(t, date)
 			if err != nil {
+				wg.Done()
 				log.Println(fmt.Sprintf("Could not retrieve price for ticker %s on date %s: %s", t, date, err))
+				return
 			}
 			results<-result
-		}(ticker)
+			wg.Done()
+		}(ticker, &wg)
 	}
 
-	for range tickers {
+	wg.Wait()
+	close(results)
+
+	for range results {
 		timeSeries = append(timeSeries, <-results)
 	}
 
