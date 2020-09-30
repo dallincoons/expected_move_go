@@ -116,7 +116,7 @@ func (this *WritePostgres) Write(prices *TimeSeriesPrice) (error) {
 
 	db, err := sqlx.Connect("postgres", this.Dsn)
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalln("failed connecting connecting to database: ", err)
 	}
 
 	tx := db.MustBegin()
