@@ -42,13 +42,6 @@ func PullPrices(from string, to string) {
 }
 
 func getWriteStrategy() prices.DisplayStrategyInterface {
-	fmt.Println(fmt.Sprintf("postgresql://%s:%s@%s:5432/%s?sslmode=disable",
-		os.Getenv("POSTGRES_USER"),
-		os.Getenv("POSTGRES_PASSWORD"),
-		os.Getenv("POSTGRES_HOST"),
-		os.Getenv("POSTGRES_DATABASE"),
-	))
-
 	return &prices.WritePostgres{
 		Dsn: fmt.Sprintf("postgresql://%s:%s@%s:5432/%s?sslmode=disable",
 			os.Getenv("POSTGRES_USER"),
