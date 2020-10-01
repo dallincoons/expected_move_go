@@ -28,10 +28,13 @@ func PullPrices(from string, to string) {
 		Tickers: prices.GetTickers(),
 	}
 
-	tz, _ := time.LoadLocation("Local")
+	tz, _ := time.LoadLocation("America/Boise")
 
 	fromDate, err := time.ParseInLocation("2006-01-02", from, tz)
 	toDate, err := time.ParseInLocation("2006-01-02", to, tz)
+
+	fmt.Println(fromDate)
+	fmt.Println(toDate)
 
 	if err != nil {
 		fmt.Println(err)
@@ -57,6 +60,8 @@ func init() {
 
 	rootCmd.AddCommand(syncAllCmd)
 
-	syncAllCmd.Flags().String("from", time.Now().AddDate(0,0,0).Format("2006-01-02"), "")
-	syncAllCmd.Flags().String("to", time.Now().Format("2006-01-02"), "")
+	loc, _ := time.LoadLocation("America/Boise")
+
+	syncAllCmd.Flags().String("from", time.Now().In(loc).AddDate(0,0,0).Format("2006-01-02"), "")
+	syncAllCmd.Flags().String("to", time.Now().In(loc).Format("2006-01-02"), "")
 }
