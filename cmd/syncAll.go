@@ -33,9 +33,6 @@ func PullPrices(from string, to string) {
 	fromDate, err := time.ParseInLocation("2006-01-02", from, tz)
 	toDate, err := time.ParseInLocation("2006-01-02", to, tz)
 
-	fmt.Println(fromDate)
-	fmt.Println(toDate)
-
 	if err != nil {
 		fmt.Println(err)
 		return
