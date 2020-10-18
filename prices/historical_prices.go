@@ -34,8 +34,12 @@ func (this *HistoricalPrices) GetDayPrices(ticker string, date string) (*TimeSer
 	var result HistoricalPriceSearchResult
 
 	json.NewDecoder(resp.Body).Decode(&result)
-
+	
 	day, ok := result.TimeSeries[date]
+
+	fmt.Println(result.TimeSeries)
+	fmt.Println(day)
+	fmt.Println(ok)
 
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("No prices were found for date %s", date))
